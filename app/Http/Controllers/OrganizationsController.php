@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\PostOrganizationRequest;
 use Illuminate\Http\Request;
 
 class OrganizationsController extends Controller
@@ -16,10 +17,10 @@ class OrganizationsController extends Controller
     }
 
     /**
-     * @param Request $request
+     * @param PostOrganizationRequest $request
      * @return array
      */
-    public function store(Request $request)
+    public function store(PostOrganizationRequest $request)
     {
         return [];
     }
