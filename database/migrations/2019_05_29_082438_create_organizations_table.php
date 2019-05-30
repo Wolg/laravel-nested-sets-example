@@ -21,7 +21,7 @@ class CreateOrganizationsTable extends Migration
             $table->integer('left')->default(0);
             $table->integer('right')->default(0);
             $table->integer('level')->default(0);
-            $table->unique('name', 'parent_id');
+            $table->unique(['name', 'parent_id']);
             $table->timestamps();
         });
     }
