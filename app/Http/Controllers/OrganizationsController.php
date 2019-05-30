@@ -24,12 +24,13 @@ class OrganizationsController extends Controller
     }
 
     /**
+     * @param Request $request
      * @param $name
      * @return OrganizationRelations
      */
-    public function show($name)
+    public function show(Request $request, $name)
     {
-        return new OrganizationRelations($this->service->findRelationsByName($name));
+        return new OrganizationRelations($this->service->findRelationsByName($name, $request->get('limit')));
     }
 
     /**
