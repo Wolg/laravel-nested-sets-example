@@ -91,4 +91,30 @@ class ShowOrganizationRelationsTest extends TestCase
                 ]
             ], json_decode($response->getContent(), true));
     }
+
+    /**
+     * @test
+     */
+    public function paginate_organization_with_relations()
+    {
+        $parent = factory(\App\Organization::class)->create(['right' => 5]);
+        $parent->root_id = $parent->id;
+        $parent->save();
+        $organization = factory(\App\Organization::class)
+            ->create(['parent_id' => $parent->id, 'left' => 1, 'right' => 2, 'level' => 1, 'root_id' => $parent->id]);
+        $sister = factory(\App\Organization::class)
+            ->create(['parent_id' => $parent->id, 'left' => 3, 'right' => 4, 'level' => 1, 'root_id' => $parent->id]);
+        $this->get('api/organizations/' . $organization->name)
+            ->assertStatus(200)
+            ->assertJsonCount(2);
+        $this->get('api/organizations/' . $organization->name . '?limit=1')
+            ->assertStatus(200)
+            ->assertJsonCount(1);
+        $this->get('api/organizations/' . $organization->name . '?limit=1&page=2')
+            ->assertStatus(200)
+            ->assertJsonCount(1);
+        $this->get('api/organizations/' . $organization->name . '?limit=1&page=3')
+            ->assertStatus(200)
+            ->assertJsonCount(0);
+    }
 }
