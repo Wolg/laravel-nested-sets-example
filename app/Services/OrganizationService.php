@@ -2,46 +2,39 @@
 namespace App\Services;
 
 use App\Organization;
+use App\Queries\OrganizationQuery;
 use Illuminate\Support\Facades\DB;
 
 class OrganizationService
 {
     /**
-     * @param $name
-     * @return mixed
+     * @var OrganizationQuery
      */
-    public function findRelationsByName($name)
+    protected $query;
+
+    /**
+     * OrganizationService constructor.
+     * @param OrganizationQuery $query
+     */
+    public function __construct(OrganizationQuery $query)
     {
-        $virtualRoot = Organization::leftJoin('organizations as parent', function ($join) {
-                $join->on('organizations.root_id', '=', 'parent.root_id');
-                $join->on('organizations.parent_id', '=', 'parent.id');
-            })
-            ->select('organizations.id as node_id', 'parent.id as parent_id', 'parent.parent_id as grandparent_id', 'organizations.root_id', 'organizations.level')
-            ->where('organizations.name', $name)
-            ->first();
-        if (!$virtualRoot) {
-            return null;
-        }
-        $virtualRootId = $virtualRoot->grandparent_id ?: ($virtualRoot->parent_id ?: $virtualRoot->node_id);
-        $organizations = Organization::leftJoin('organizations as parent', function ($join) {
-                $join->on('organizations.root_id', '=', 'parent.root_id');
-            })
-            ->whereRaw('organizations.left BETWEEN parent.left AND parent.right')
-            ->where('parent.id', $virtualRootId)
-            ->where('organizations.root_id', $virtualRoot->root_id)
-            ->where('organizations.name', '!=', $name)
-            ->groupBy('organizations.name', 'organizations.level')
-            ->orderBy('organizations.name')
-            ->selectRaw('organizations.name, IF(organizations.level > ?, "daughter", IF(organizations.level = ?, "sister", "parent")) as relation',
-                [$virtualRoot->level, $virtualRoot->level])
-            ->get();
-        return $organizations;
+        $this->query = $query;
     }
 
     /**
-     * @param $organization
+     * @param string $name
+     * @param int $limit
+     * @return mixed
      */
-    public function store($organization)
+    public function findRelationsByName(string $name, int $limit)
+    {
+        return $this->query->findRelationsByName($name, $limit);
+    }
+    /**
+     * @param array $organization
+     * @throws \Throwable
+     */
+    public function store(array $organization)
     {
         try{
             DB::beginTransaction();
@@ -60,7 +53,7 @@ class OrganizationService
      * @param int $level
      * @param int $number
      */
-    protected function buildTree($organizations, $parentId = null, $rootId = null, $level = 0, &$number = 0)
+    protected function buildTree(array $organizations, int $parentId = null, int $rootId = null, int $level = 0, int &$number = 0)
     {
         foreach ($organizations as $organization) {
             $model = new Organization();

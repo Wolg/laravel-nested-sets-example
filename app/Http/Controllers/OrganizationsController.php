@@ -30,7 +30,7 @@ class OrganizationsController extends Controller
      */
     public function show(Request $request, $name)
     {
-        return new OrganizationRelations($this->service->findRelationsByName($name, $request->get('limit')));
+        return new OrganizationRelations($this->service->findRelationsByName($name, (int) $request->get('limit')));
     }
 
     /**
