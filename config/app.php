@@ -228,4 +228,10 @@ return [
 
     ],
 
+    'organizations' => [
+        'pagination' => [
+            'limit' => 100,
+        ]
+    ]
+
 ];
