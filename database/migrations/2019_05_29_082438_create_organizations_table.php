@@ -16,11 +16,12 @@ class CreateOrganizationsTable extends Migration
         Schema::create('organizations', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->string('name');
-            $table->bigInteger('parent_id');
-            $table->bigInteger('root_id');
-            $table->integer('left');
-            $table->integer('right');
-            $table->integer('level');
+            $table->bigInteger('parent_id')->nullable();
+            $table->bigInteger('root_id')->default(0);
+            $table->integer('left')->default(0);
+            $table->integer('right')->default(0);
+            $table->integer('level')->default(0);
+            $table->unique('name', 'parent_id');
             $table->timestamps();
         });
     }
