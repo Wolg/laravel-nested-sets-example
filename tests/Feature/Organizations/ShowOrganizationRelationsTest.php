@@ -7,6 +7,8 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 
 class ShowOrganizationRelationsTest extends TestCase
 {
+    use RefreshDatabase;
+
     /**
      * @test
      */
