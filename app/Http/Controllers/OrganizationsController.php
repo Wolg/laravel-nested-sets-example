@@ -37,7 +37,7 @@ class OrganizationsController extends Controller
     public function store(PostOrganizationRequest $request)
     {
         $this->service->store($request->all());
-        return response()->json(['message' => 'Organization saved succesfully!']);
+        return response()->json(['message' => trans('organization.created.success')]);
     }
 
 }
