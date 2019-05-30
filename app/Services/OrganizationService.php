@@ -2,6 +2,7 @@
 namespace App\Services;
 
 use App\Organization;
+use Illuminate\Support\Facades\DB;
 
 class OrganizationService
 {
@@ -10,7 +11,14 @@ class OrganizationService
      */
     public function store($organization)
     {
-        $this->buildTree([$organization]);
+        try{
+            DB::beginTransaction();
+            $this->buildTree([$organization]);
+            DB::commit();
+        } catch(\Throwable $e) {
+            DB::rollBack();
+            throw $e;
+        }
     }
 
     /**
@@ -20,7 +28,7 @@ class OrganizationService
      * @param int $level
      * @param int $number
      */
-    protected function buildTree($organizations, $parentId = null, $root = null, $level = 0, &$number = 0)
+    protected function buildTree($organizations, $parentId = null, $rootId = null, $level = 0, &$number = 0)
     {
         foreach ($organizations as $organization) {
             $model = new Organization();
@@ -29,13 +37,13 @@ class OrganizationService
             $model->level = $level;
             $model->left = $number++;
             $model->save();
-            if ($root == null) {
-                $root = $model->id;
+            if ($rootId == null) {
+                $rootId = $model->id;
             }
             if (isset($organization['daughters']) && is_array($organization['daughters']) ) {
-                $this->buildTree($organization['daughters'], $model->id, $root, $level + 1, $number);
+                $this->buildTree($organization['daughters'], $model->id, $rootId, $level + 1, $number);
             }
-            $model->root = $root;
+            $model->root_id = $rootId;
             $model->right = $number++;
             $model->save();
         }
