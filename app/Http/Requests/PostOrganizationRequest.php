@@ -24,7 +24,7 @@ class PostOrganizationRequest extends FormRequest
     public function rules()
     {
         $rules = [
-            'org_name' => 'required|max:255',
+            'org_name' => 'required|max:255|unique:organizations,name,NULL,id,parent_id,NULL',
             'daughters' => 'sometimes|required|array'
         ];
         return $rules;
