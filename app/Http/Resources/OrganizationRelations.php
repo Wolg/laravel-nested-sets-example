@@ -20,7 +20,7 @@ class OrganizationRelations extends JsonResource
         return $this->resource->map(function ($item) {
             return [
                 'org_name' => $item->name,
-                'level' => 'item',
+                'relationship_type' => $item->relation,
             ];
         });
     }
