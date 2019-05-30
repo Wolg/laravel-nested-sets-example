@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\PostOrganizationRequest;
+use App\Http\Resources\OrganizationRelations;
 use App\Services\OrganizationService;
 use Illuminate\Http\Request;
 
@@ -21,13 +22,14 @@ class OrganizationsController extends Controller
     {
         $this->service = $service;
     }
+
     /**
      * @param $name
-     * @return array
+     * @return OrganizationRelations
      */
     public function show($name)
     {
-        return [];
+        return new OrganizationRelations($this->service->findRelationsByName($name));
     }
 
     /**
